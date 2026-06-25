@@ -1,0 +1,7 @@
+# Forked project (not tracked in this repo)
+pinky_pro/src/pinky_pro/
+
+# colcon / ROS 2 build artifacts (generated in the workspace root)
+pinky_pro/build/
+pinky_pro/install/
+pinky_pro/log/
