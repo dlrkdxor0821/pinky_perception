@@ -39,6 +39,31 @@ perception/                # ⭐ this project's work (scaffold stage)
   models/                  # weights (.pt / .param / .bin) — GIT-IGNORED
 ```
 
+## Runtime setup (as deployed on this Pi)
+
+- **venv**: `perception/.venv` (created with `--system-site-packages` to reuse the
+  system OpenCV/numpy that ROS uses). Run edge/preview scripts with
+  `perception/.venv/bin/python`. System numpy is 1.26.4 — do NOT let an install
+  upgrade it (would break ROS cv_bridge).
+- **Edge inference = raw NCNN, NOT Ultralytics** (`edge/detector_ncnn_raw.py`).
+  Only `ncnn` + numpy + opencv installed — **no torch / no ultralytics** (torch is
+  426MB and unused for NCNN compute; we decode YOLO output + NMS by hand). The
+  Ultralytics-based `detector_ncnn.py` is kept for reference but needs torch.
+- **Camera is CSI → must use picamera2/libcamera** (`--source csi`). OpenCV V4L2
+  (`/dev/video0`) returns all-black frames for it. `common/camera.py` has both
+  backends; picamera2 "RGB888" arrays are already BGR.
+- **Edge model**: `models/pinky_pro_and_person_ncnn_model/` from HF
+  `ASD0821/pinky_pro_and_person-ncnn`. Classes `0=person, 1=mobile_robot`,
+  **imgsz 320**. Measured ~3 FPS / ~313 ms on this Pi.
+- **Server model is different (full PyTorch)** — intentional asymmetry: edge-light
+  vs server-full. Interpret mAP with that in mind.
+- **UDP protocol requirement (mandatory)**: `common/protocol.py` does per-datagram
+  CRC32 checksum + drops stale/older incomplete frames (always reassembles the
+  newest frame). Keep these if editing the protocol.
+- **Headless verify**: `detect_edge.py --save N` writes annotated frames to
+  `benchmark/results/frames/`; `edge/preview_server.py` streams live MJPEG to a
+  browser at `http://<pi-ip>:8080/` (stdlib http.server, no Flask).
+
 ## Important conventions & gotchas
 
 - **`pinky_pro/src/pinky_pro/` is an upstream fork and is git-ignored.** Do not

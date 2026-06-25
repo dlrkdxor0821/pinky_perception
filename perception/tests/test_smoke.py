@@ -52,6 +52,25 @@ def test_result_codec():
     assert fid == 99 and data == b'{"ok":1}'
 
 
+def test_crc_rejects_corruption():
+    dg = encode_frame(1, b"payload-data")[0]
+    corrupted = bytearray(dg)
+    corrupted[-1] ^= 0xFF  # flip a payload bit
+    assert Reassembler().push(bytes(corrupted)) is None, "corrupted datagram not rejected"
+
+
+def test_drops_stale_frame():
+    # frame 1 partial (1 of 2 chunks), then frame 2 fully -> frame 1 discarded
+    r = Reassembler()
+    f1 = encode_frame(1, b"a" * 100000, chunk_size=60000)  # 2 chunks
+    assert r.push(f1[0]) is None  # only first chunk of frame 1
+    f2 = encode_frame(2, b"b" * 50000)  # 1 chunk -> completes immediately
+    out = r.push(f2[0])
+    assert out and out[0] == 2 and out[1] == b"b" * 50000
+    # late second chunk of stale frame 1 must be ignored, not complete frame 1
+    assert r.push(f1[1]) is None
+
+
 def test_percentile():
     vals = list(range(1, 101))
     assert percentile(vals, 50) == 50.5
