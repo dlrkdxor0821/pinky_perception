@@ -31,8 +31,8 @@ def main():
     ap.add_argument("--show", action="store_true")
     ap.add_argument("--save", type=int, default=0,
                     help="save every Nth annotated frame to disk (0=off) — for headless verify")
-    ap.add_argument("--save-dir", default="benchmark/results/frames")
-    ap.add_argument("--out", default="benchmark/results/edge.csv")
+    ap.add_argument("--save-dir", default=str(PKG_ROOT / "benchmark/results/frames"))
+    ap.add_argument("--out", default=str(PKG_ROOT / "benchmark/results/edge.csv"))
     args = ap.parse_args()
 
     from edge.detector_ncnn_raw import NCNNRawDetector

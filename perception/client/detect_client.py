@@ -14,7 +14,8 @@ import socket
 import sys
 import time
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
+PKG_ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PKG_ROOT))
 
 
 def send_udp(sock, server_addr, frame_id, jpeg, timeout=2.0):
@@ -74,7 +75,7 @@ def main():
 
     src = int(args.source) if args.source.isdigit() else args.source
     metrics = Metrics(label=f"server-{args.transport}")
-    out = args.out or f"benchmark/results/server_{args.transport}.csv"
+    out = args.out or str(PKG_ROOT / f"benchmark/results/server_{args.transport}.csv")
 
     sock = None
     url = None

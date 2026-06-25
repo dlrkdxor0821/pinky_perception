@@ -22,6 +22,7 @@ perception/models/
 
 # Benchmark outputs
 perception/benchmark/results/
+/benchmark/          # stray outputs if a script is run from the repo root
 
 # Eval datasets (labeled test images/labels — usually large)
 perception/eval/datasets/*/

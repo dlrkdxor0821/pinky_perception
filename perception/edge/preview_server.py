@@ -103,7 +103,7 @@ def main():
                     help="rotate frames to make the scene upright (this cam needs 180)")
     ap.add_argument("--save", type=int, default=0,
                     help="also save every Nth annotated frame to disk (0=off)")
-    ap.add_argument("--save-dir", default="benchmark/results/frames")
+    ap.add_argument("--save-dir", default=str(PKG_ROOT / "benchmark/results/frames"))
     ap.add_argument("--hflip", action="store_true")
     ap.add_argument("--vflip", action="store_true")
     ap.add_argument("--port", type=int, default=8080)
