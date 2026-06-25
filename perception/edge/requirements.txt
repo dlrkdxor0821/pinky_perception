@@ -1,0 +1,6 @@
+# Edge / on-device (run on the Raspberry Pi, aarch64)
+ultralytics>=8.3.0
+ncnn
+opencv-python>=4.8
+numpy
+psutil

@@ -1,0 +1,4 @@
+# Robot-side client (run on the Raspberry Pi)
+opencv-python>=4.8
+numpy
+requests

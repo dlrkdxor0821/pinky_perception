@@ -1,0 +1,7 @@
+# AI server (run on local PC, GPU recommended)
+ultralytics>=8.3.0
+torch
+fastapi>=0.110
+uvicorn[standard]>=0.29
+opencv-python>=4.8
+numpy

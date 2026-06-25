@@ -5,3 +5,23 @@ pinky_pro/src/pinky_pro/
 pinky_pro/build/
 pinky_pro/install/
 pinky_pro/log/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Model weights (large / regenerable) — export with perception/scripts
+perception/models/
+*.pt
+*.onnx
+*.param
+*.bin
+
+# Benchmark outputs
+perception/benchmark/results/
+
+# Eval datasets (labeled test images/labels — usually large)
+perception/eval/datasets/*/
