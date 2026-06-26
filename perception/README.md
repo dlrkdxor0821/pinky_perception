@@ -18,6 +18,7 @@ models/    YOLO weights / NCNN model dir (git-ignored)
 ```
 
 > **어떤 지표를 평가할지**는 [`METRICS.md`](METRICS.md) 참고 (기술조사 + 측정 위치 정리).
+> **실제 테스트 절차**(엣지/서버 측정 + 박스 시각화)는 [`WORKFLOW.md`](WORKFLOW.md) 런북 참고.
 
 ## Install
 
@@ -40,6 +41,8 @@ mv yolo11n_ncnn_model models/
 ```bash
 python3 scripts/run_server.py --weights yolo11n.pt --device cuda
 # HTTP :8000  (POST /detect)   |   UDP :9000  (chunked JPEG)
+# add --preview to serve a live annotated MJPEG at http://<server-ip>:8000/
+#   (quality check only — drawing+encoding adds load; leave OFF while benchmarking)
 ```
 
 ## 3. Benchmark
