@@ -42,6 +42,7 @@ mv yolo11n_ncnn_model models/
 python3 scripts/run_server.py --weights yolo11n.pt --device cuda
 # HTTP :8000  (POST /detect)   |   UDP :9000  (chunked JPEG)
 # add --preview to serve a live annotated MJPEG at http://<server-ip>:8000/
+#   with a live FPS + inference-latency overlay (polled from /fps)
 #   (quality check only — drawing+encoding adds load; leave OFF while benchmarking)
 ```
 

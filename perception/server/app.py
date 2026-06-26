@@ -7,6 +7,36 @@ runs in the same process on a different port (see scripts/run_server.py).
 import time
 
 
+# Live viewer: fullscreen MJPEG stream with an FPS / inference-latency overlay
+# that polls /fps a few times a second (kept off the image so it adds no
+# per-frame CPU on the detection path).
+_VIEWER_HTML = """<!doctype html>
+<html><head><meta charset="utf-8"><title>pinky_perception live</title>
+<style>
+  html,body{margin:0;height:100%;background:#111;overflow:hidden}
+  #v{width:100vw;height:100vh;object-fit:contain;display:block}
+  #hud{position:fixed;top:12px;left:12px;padding:8px 12px;border-radius:8px;
+       background:rgba(0,0,0,.55);color:#0f0;font:600 22px/1.25 monospace;
+       white-space:pre}
+</style></head>
+<body>
+  <img id="v" src="/stream" alt="live">
+  <div id="hud">FPS --</div>
+  <script>
+    const hud = document.getElementById('hud');
+    async function tick(){
+      try{
+        const s = await (await fetch('/fps', {cache:'no-store'})).json();
+        const fps = (s.fps ?? 0).toFixed(1);
+        const ms  = s.server_infer_ms == null ? '--' : s.server_infer_ms.toFixed(1);
+        hud.textContent = `FPS ${fps}\\ninfer ${ms} ms`;
+      }catch(e){ hud.textContent = 'FPS --'; }
+    }
+    tick(); setInterval(tick, 400);
+  </script>
+</body></html>"""
+
+
 def create_app(detector, preview=None):
     """`preview` is an optional common.preview.LatestFrame; when given, each
     request stores an annotated JPEG so /stream can show live boxes."""
@@ -41,17 +71,20 @@ def create_app(detector, preview=None):
             from common.viz import draw_detections
             ok, buf = cv2.imencode(".jpg", draw_detections(img, dets))
             if ok:
-                preview.update(buf.tobytes())
+                preview.update(buf.tobytes(), infer_ms=infer_ms)
         return {"detections": dets, "server_infer_ms": round(infer_ms, 2)}
+
+    @app.get("/fps")
+    def fps():
+        if preview is None:
+            return JSONResponse({"fps": 0.0, "server_infer_ms": None})
+        return preview.stats()
 
     @app.get("/")
     def viewer():
         if preview is None:
             return HTMLResponse("<p>preview disabled — start the server with --preview</p>")
-        return HTMLResponse(
-            "<html><body style='margin:0;background:#111'>"
-            "<img src='/stream' style='width:100vw;height:100vh;object-fit:contain'>"
-            "</body></html>")
+        return HTMLResponse(_VIEWER_HTML)
 
     @app.get("/stream")
     def stream():

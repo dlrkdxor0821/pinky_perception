@@ -44,7 +44,7 @@ def run_udp_server(detector, host="0.0.0.0", port=9000, stop=None, preview=None)
             from common.viz import draw_detections
             ok, buf = cv2.imencode(".jpg", draw_detections(img, dets))
             if ok:
-                preview.update(buf.tobytes())
+                preview.update(buf.tobytes(), infer_ms=infer_ms)
         payload = json.dumps(
             {"detections": dets, "server_infer_ms": round(infer_ms, 2)}
         ).encode()
