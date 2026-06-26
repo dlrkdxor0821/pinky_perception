@@ -60,13 +60,14 @@ def test_crc_rejects_corruption():
 
 
 def test_drops_stale_frame():
-    # frame 1 partial (1 of 2 chunks), then frame 2 fully -> frame 1 discarded
+    # frame 1 partial (1 of 2 chunks), then frame 2 fully -> frame 1 discarded.
+    # Use explicit chunk_size so the test does not depend on DEFAULT_CHUNK.
     r = Reassembler()
-    f1 = encode_frame(1, b"a" * 100000, chunk_size=60000)  # 2 chunks
+    f1 = encode_frame(1, b"a" * 2000, chunk_size=1000)  # 2 chunks
     assert r.push(f1[0]) is None  # only first chunk of frame 1
-    f2 = encode_frame(2, b"b" * 50000)  # 1 chunk -> completes immediately
+    f2 = encode_frame(2, b"b" * 500, chunk_size=1000)  # 1 chunk -> completes immediately
     out = r.push(f2[0])
-    assert out and out[0] == 2 and out[1] == b"b" * 50000
+    assert out and out[0] == 2 and out[1] == b"b" * 500
     # late second chunk of stale frame 1 must be ignored, not complete frame 1
     assert r.push(f1[1]) is None
 

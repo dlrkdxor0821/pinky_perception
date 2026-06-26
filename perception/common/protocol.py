@@ -20,7 +20,12 @@ import zlib
 
 HEADER_FMT = "!IHHI"  # frame_id, total_chunks, chunk_idx, crc32(payload)
 HEADER_SIZE = struct.calcsize(HEADER_FMT)
-DEFAULT_CHUNK = 60000  # payload bytes per datagram (under UDP 65507 limit)
+DEFAULT_CHUNK = 1400  # payload bytes per datagram — kept under the ~1500 Ethernet/
+# WiFi MTU (minus IP/UDP/app headers) so each datagram fits in ONE IP packet and is
+# NOT IP-fragmented. A big (e.g. 60 KB) datagram is split into ~40 IP fragments by the
+# kernel, and losing any single fragment silently drops the whole datagram before the
+# app's per-chunk CRC can help. MTU-sized chunks make that CRC + reassembly meaningful
+# and behave predictably on lossy WiFi.
 
 RESULT_FMT = "!I"  # frame_id prefix on the detection reply
 RESULT_SIZE = struct.calcsize(RESULT_FMT)
