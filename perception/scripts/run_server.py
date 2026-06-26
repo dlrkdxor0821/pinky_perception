@@ -19,7 +19,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--weights", default="yolo11n.pt")
     ap.add_argument("--device", default=None, help="cuda / cpu / 0 ...")
-    ap.add_argument("--conf", type=float, default=0.25)
+    ap.add_argument("--conf", type=float, default=0.6)
     ap.add_argument("--imgsz", type=int, default=640)
     ap.add_argument("--host", default="0.0.0.0")
     ap.add_argument("--http-port", type=int, default=8000)
