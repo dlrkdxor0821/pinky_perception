@@ -100,9 +100,9 @@ def main():
     if record:
         from common.viz import draw_detections
 
+    cpu_percent()  # prime psutil's delta counter
     with Camera(src, width=args.width, height=args.height,
                 rotate=args.rotate, hflip=args.hflip, vflip=args.vflip) as cam:
-        cpu_percent()  # prime psutil's delta counter
         for i in range(args.frames):
             frame = cam.read()
             ok, buf = cv2.imencode(".jpg", frame, enc)
@@ -130,6 +130,7 @@ def main():
                 avg_conf=(sum(confs) / len(confs) if confs else None),
                 jpeg_bytes=len(jpeg),
                 cpu=cpu_percent(), ram_mb=ram_used_mb(), temp_c=pi_temp_c(),
+                throttled=pi_throttled(),
             )
 
             if record:
@@ -167,9 +168,9 @@ def main():
         print(f"[client] recorded annotated video -> {record}")
 
     metrics.print_summary()
-    print("[client] throttled flags:", pi_throttled())
     lost = sum(1 for r in metrics.rows if r.get("lost"))
     print(f"[client] lost/timeout frames: {lost}/{len(metrics.rows)}")
+    print("[client] throttled flags:", pi_throttled())
     metrics.save_csv(out)
 
 

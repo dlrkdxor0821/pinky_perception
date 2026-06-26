@@ -64,6 +64,7 @@ def main():
                 n_det=len(dets),
                 avg_conf=(sum(confs) / len(confs) if confs else None),
                 cpu=cpu_percent(), ram_mb=ram_used_mb(), temp_c=pi_temp_c(),
+                throttled=pi_throttled(),
             )
             if args.save and i % args.save == 0:
                 import cv2
