@@ -13,7 +13,7 @@ import socket
 import time
 
 
-def run_udp_server(detector, host="0.0.0.0", port=9000, stop=None):
+def run_udp_server(detector, host="0.0.0.0", port=9000, stop=None, preview=None):
     import numpy as np
     import cv2
     from common.protocol import Reassembler, encode_result
@@ -40,6 +40,11 @@ def run_udp_server(detector, host="0.0.0.0", port=9000, stop=None):
         t0 = time.perf_counter()
         dets = detector.detect(img)
         infer_ms = (time.perf_counter() - t0) * 1000
+        if preview is not None:
+            from common.viz import draw_detections
+            ok, buf = cv2.imencode(".jpg", draw_detections(img, dets))
+            if ok:
+                preview.update(buf.tobytes())
         payload = json.dumps(
             {"detections": dets, "server_infer_ms": round(infer_ms, 2)}
         ).encode()

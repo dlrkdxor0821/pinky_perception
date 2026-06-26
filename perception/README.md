@@ -56,6 +56,17 @@ python3 scripts/run_server.py --weights yolo11n.pt --device cuda
 python3 benchmark/compare.py benchmark/results/*.csv
 ```
 
+### Record an annotated video of the server path
+
+`detect_client.py --record` draws the server's detection boxes (+ live FPS
+overlay) onto each frame and saves an `.mp4`. Playback FPS is auto-estimated
+from the run (`--record-fps N` to force it). CSI cam on this Pi needs `--rotate 180`.
+
+```bash
+python3 client/detect_client.py --transport udp --host <server-ip> \
+    --source csi --rotate 180 --frames 300 --record benchmark/results/server_udp.mp4
+```
+
 ## Metrics
 
 | now (no labels needed) | later (needs labeled test set) |
